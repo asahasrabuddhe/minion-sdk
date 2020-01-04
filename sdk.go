@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gosuri/uilive"
 	"go.ajitem.com/bindiff"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"syscall"
 )
 
@@ -71,10 +73,30 @@ func Check(opts Options) ([]byte, error) {
 		return nil, UpdateNotAvailable
 	case http.StatusOK:
 		// got update, download
-		body, err := ioutil.ReadAll(response.Body)
+		writer := uilive.New()
+		writer.Start()
+
+		total, err := strconv.Atoi(response.Header.Get("Content-Length"))
 		if err != nil {
 			return nil, err
 		}
+
+		downloaded := 0
+
+		reader := &progressReader{
+			Reader: response.Body,
+			Reporter: func(r int) {
+				downloaded += r
+				_, _ = fmt.Fprintf(writer, "Downloading.. (%d/%d) bytes\n", downloaded, total)
+			},
+		}
+
+		body, err := ioutil.ReadAll(reader)
+		if err != nil {
+			return nil, err
+		}
+
+		writer.Stop()
 
 		return body, nil
 	default:
