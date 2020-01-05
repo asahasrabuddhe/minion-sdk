@@ -16,7 +16,7 @@ import (
 	"syscall"
 )
 
-const UserAgent = "pkgUpdater/1.0.0"
+const UserAgent = "minion-updater/1.0.0"
 
 var UpdateNotAvailable = errors.New("no update available")
 
@@ -83,7 +83,7 @@ func Check(opts Options) ([]byte, error) {
 
 		downloaded := 0
 
-		reader := &progressReader{
+		reader := &ProgressReader{
 			Reader: response.Body,
 			Reporter: func(r int) {
 				downloaded += r
