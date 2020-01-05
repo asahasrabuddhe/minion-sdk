@@ -1,4 +1,4 @@
-package pkg
+package minonsdk
 
 import (
 	"bytes"
@@ -41,7 +41,7 @@ func Check(opts Options) ([]byte, error) {
 	}
 
 	var client http.Client
-	client.Transport = newUserAgentTransport(UserAgent, client.Transport)
+	client.Transport = NewUserAgentTransport(UserAgent, client.Transport)
 
 	payload, err := json.Marshal(map[string]interface{}{
 		"app_id":       opts.AppId,

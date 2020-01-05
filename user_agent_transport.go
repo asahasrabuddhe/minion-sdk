@@ -1,4 +1,4 @@
-package pkg
+package minonsdk
 
 import "net/http"
 
@@ -7,7 +7,7 @@ type userAgentTransport struct {
 	rt        http.RoundTripper
 }
 
-func newUserAgentTransport(userAgent string, rt http.RoundTripper) *userAgentTransport {
+func NewUserAgentTransport(userAgent string, rt http.RoundTripper) *userAgentTransport {
 	if rt == nil {
 		rt = http.DefaultTransport
 	}

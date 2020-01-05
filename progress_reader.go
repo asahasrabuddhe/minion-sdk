@@ -1,4 +1,4 @@
-package pkg
+package minonsdk
 
 import "io"
 
