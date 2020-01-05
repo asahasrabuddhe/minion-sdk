@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gosuri/uilive"
-	"go.ajitem.com/bindiff"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -14,6 +12,9 @@ import (
 	"runtime"
 	"strconv"
 	"syscall"
+
+	"github.com/gosuri/uilive"
+	"go.ajitem.com/bindiff"
 )
 
 const UserAgent = "minion-updater/1.0.0"
