@@ -58,6 +58,8 @@ func Check(opts Options) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Set("Content-Type", "application/json")
 	req.Close = true
 
 	response, err := client.Do(req)
