@@ -1,4 +1,4 @@
-package minonsdk
+package sdk
 
 import "net/http"
 
