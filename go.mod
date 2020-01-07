@@ -1,4 +1,4 @@
-module go.ajitem.com/minion-sdk
+module go.ajitem.com/minion/sdk
 
 go 1.13
 
