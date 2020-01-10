@@ -26,9 +26,27 @@ type Options struct {
 	Version        string
 	Channel        string
 	UpdateCheckURL string
+	NewVersion     string
 }
 
-func Check(opts Options) ([]byte, error) {
+type UpdateResponse struct {
+	Success bool   `json:"success"`
+	Version string `json:"version"`
+}
+
+type Minion struct {
+	client http.Client
+}
+
+func New() *Minion {
+	m := &Minion{}
+
+	m.client.Transport = NewUserAgentTransport(UserAgent, m.client.Transport)
+
+	return m
+}
+
+func (m *Minion) Check(opts Options) (*UpdateResponse, error) {
 	if opts.AppId == "" {
 		return nil, errors.New("pkg updater sdk: app id cannot be empty")
 	}
@@ -41,9 +59,6 @@ func Check(opts Options) ([]byte, error) {
 		opts.Channel = "stable"
 	}
 
-	var client http.Client
-	client.Transport = NewUserAgentTransport(UserAgent, client.Transport)
-
 	payload, err := json.Marshal(map[string]interface{}{
 		"app_id":       opts.AppId,
 		"version":      opts.Version,
@@ -55,7 +70,7 @@ func Check(opts Options) ([]byte, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, opts.UpdateCheckURL, bytes.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/check", opts.UpdateCheckURL), bytes.NewReader(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +78,61 @@ func Check(opts Options) ([]byte, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Close = true
 
-	response, err := client.Do(req)
+	response, err := m.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	switch response.StatusCode {
+	case http.StatusNoContent:
+		// no update available
+		return nil, UpdateNotAvailable
+	case http.StatusOK:
+		// update available
+		var res UpdateResponse
+		err := json.Unmarshal(body, &res)
+		if err != nil {
+			return nil, err
+		}
+
+		opts.NewVersion = res.Version
+
+		return &res, nil
+	default:
+		// error
+		return nil, errors.New(string(body))
+	}
+}
+
+func (m *Minion) Download(opts Options) ([]byte, error) {
+	// got update, download
+
+	payload, err := json.Marshal(map[string]interface{}{
+		"app_id":       opts.AppId,
+		"version":      opts.Version,
+		"new_version":  opts.NewVersion,
+		"channel":      opts.Channel,
+		"os":           runtime.GOOS,
+		"architecture": runtime.GOARCH,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/download", opts.UpdateCheckURL), bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Close = true
+
+	response, err := m.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
