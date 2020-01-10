@@ -180,7 +180,7 @@ func (m *Minion) Download(opts Options) ([]byte, error) {
 	}
 }
 
-func Apply(b []byte) error {
+func (m *Minion) Apply(b []byte) error {
 	oldPath, err := os.Executable()
 	if err != nil {
 		return err
@@ -225,7 +225,7 @@ func Apply(b []byte) error {
 	return nil
 }
 
-func Reload() error {
+func (m *Minion) Reload() error {
 	binSelf, err := os.Executable()
 	if err != nil {
 		return err
