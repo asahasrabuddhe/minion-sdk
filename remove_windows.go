@@ -17,5 +17,5 @@ func RemoveFile(path string) error {
 		return err
 	}
 
-	return syscall.CreateProcess(nil, argv, bil, nil, true, 0, nil, nil, &startupInfo, &processInfo)
+	return syscall.CreateProcess(nil, argv, nil, nil, true, 0, nil, nil, &startupInfo, &processInfo)
 }
