@@ -217,7 +217,7 @@ func (m *Minion) Apply(b []byte) error {
 		return err
 	}
 
-	err = os.Remove(intermediatePath)
+	err = RemoveFile(intermediatePath)
 	if err != nil {
 		return err
 	}
