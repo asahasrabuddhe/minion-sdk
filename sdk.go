@@ -187,26 +187,33 @@ func (m *Minion) Apply(b []byte) error {
 	}
 
 	newPath := fmt.Sprintf("%s%cnew_%s", filepath.Dir(oldPath), os.PathSeparator, filepath.Base(oldPath))
-	intermediatePath := fmt.Sprintf("%s%cold_%s", filepath.Dir(oldPath), os.PathSeparator, filepath.Base(oldPath))
 
 	oldFile, err := os.Open(oldPath)
 	if err != nil {
 		return err
 	}
-	defer oldFile.Close()
 
 	newFile, err := os.OpenFile(newPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
-	defer newFile.Close()
 
 	err = bindiff.Patch(oldFile, newFile, bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
 
-	err = RenameFile(oldPath, intermediatePath)
+	err = oldFile.Close()
+	if err != nil {
+		return err
+	}
+
+	err = newFile.Close()
+	if err != nil {
+		return err
+	}
+
+	err = RemoveFile(oldPath)
 	if err != nil {
 		return err
 	}
@@ -214,11 +221,6 @@ func (m *Minion) Apply(b []byte) error {
 	err = RenameFile(newPath, oldPath)
 	if err != nil {
 		// handle unsuccessful move
-		return err
-	}
-
-	err = RemoveFile(intermediatePath)
-	if err != nil {
 		return err
 	}
 
