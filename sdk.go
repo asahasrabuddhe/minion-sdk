@@ -206,12 +206,12 @@ func (m *Minion) Apply(b []byte) error {
 		return err
 	}
 
-	err = os.Rename(oldPath, intermediatePath)
+	err = RenameFile(oldPath, intermediatePath)
 	if err != nil {
 		return err
 	}
 
-	err = os.Rename(newPath, oldPath)
+	err = RenameFile(newPath, oldPath)
 	if err != nil {
 		// handle unsuccessful move
 		return err
