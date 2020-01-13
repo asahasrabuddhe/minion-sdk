@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -186,8 +187,8 @@ func (m *Minion) Apply(b []byte) error {
 		return err
 	}
 
-	newPath := fmt.Sprintf("%s/new_%s", filepath.Dir(oldPath), filepath.Base(oldPath))
-	intermediatePath := fmt.Sprintf("%s/old_%s", filepath.Dir(oldPath), filepath.Base(oldPath))
+	newPath := path.Join(filepath.Dir(oldPath), fmt.Sprintf("new_%s", filepath.Base(oldPath)))
+	intermediatePath := path.Join(filepath.Dir(oldPath), fmt.Sprintf("old_%s", filepath.Base(oldPath)))
 
 	oldFile, err := os.Open(oldPath)
 	if err != nil {
