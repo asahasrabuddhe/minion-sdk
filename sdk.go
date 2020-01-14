@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gosuri/uilive"
-	"go.ajitem.com/bindiff"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -15,6 +13,9 @@ import (
 	"runtime"
 	"strconv"
 	"syscall"
+
+	"github.com/gosuri/uilive"
+	"go.ajitem.com/bindiff"
 )
 
 const UserAgent = "minion-updater/1.0.0"
@@ -184,7 +185,7 @@ func (m *Minion) CurrentPath() (string, error) {
 	return os.Executable()
 }
 
-func(m *Minion) OldPath() (string, error) {
+func (m *Minion) OldPath() (string, error) {
 	path, err := m.CurrentPath()
 	if err != nil {
 		return "", err
@@ -193,7 +194,7 @@ func(m *Minion) OldPath() (string, error) {
 	return fmt.Sprintf("%s%c.%s.old", filepath.Dir(path), os.PathSeparator, filepath.Base(path)), nil
 }
 
-func(m *Minion) NewPath() (string, error) {
+func (m *Minion) NewPath() (string, error) {
 	path, err := m.CurrentPath()
 	if err != nil {
 		return "", err
